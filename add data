@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace newdatabase
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+          
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                string connetionString;
+                SqlConnection con;
+                connetionString = @"Data Source=WIN-U412I9LKOT5\SQLEXPRESS;Initial Catalog=dexterdbase;Integrated Security=True";
+                con = new SqlConnection(connetionString);
+                con.Open();
+                SqlCommand cmd = new SqlCommand("insert into Unitopdbase values(@Id,@Name,@Age)", con);
+                cmd.Parameters.AddWithValue("@Id", int.Parse(Idtxt.Text));
+                cmd.Parameters.AddWithValue("@Name", (Nametxt.Text));
+                cmd.Parameters.AddWithValue("@Age", int.Parse(Agetxt.Text));
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("SUCESSFULLY ADD  !");
+                con.Close();
+            }
+            catch (Exception ex)
+
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+    }
+}
