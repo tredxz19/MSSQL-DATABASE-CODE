@@ -1,0 +1,320 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace TestCrudApp
+{
+    public partial class Form1 : Form
+    {
+        string connetionString;
+        SqlConnection con;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        void clearTxt()
+        {          
+            txtBranch.Clear();
+            txtRemarks.Clear();
+            txtAddress.Clear();
+        }
+        void readOnly()
+        {           
+            txtBranch.ReadOnly = true;
+            txtRemarks.ReadOnly = true;
+            txtAddress.ReadOnly = true;
+        }
+        void readEnable()
+        {
+            txtBranch.ReadOnly = false;
+            txtRemarks.ReadOnly = false;
+            txtAddress.ReadOnly = false;
+        }
+        void buttonVisibleFalse()
+        {
+            btnSearch.Visible = false;
+            btnInsert.Visible = false;
+            btnUpdate.Visible = false;
+            btnDelete.Visible = false;
+            btnClear.Visible = false;
+       
+        }
+        void buttonVisibleTrue()
+        {
+            btnSearch.Visible = true;
+            btnInsert.Visible = true;
+            btnUpdate.Visible = true;
+            btnDelete.Visible = true;
+            btnClear.Visible = true;
+        }
+
+        private void btnInsert_Click(object sender, EventArgs e)
+        {
+            if (btnInsert.Text == "Add")
+            {
+                buttonVisibleFalse();
+                btnInsert.Visible = true;
+                clearTxt();
+                txtID.Clear();
+                readEnable();
+                btnInsert.Text = "Insert";
+            }
+            else if (btnInsert.Text == "Insert")
+            {
+                if (txtID.Text == "")
+                {
+                    MessageBox.Show("Please input ID");
+                }
+                else if (txtBranch.Text == "")
+                {
+                    MessageBox.Show("Please input Branch");
+                }
+                else if (txtRemarks.Text == "")
+                {
+                    MessageBox.Show("Please input Remarks");
+                }
+                else if (txtAddress.Text == "")
+                {
+                    MessageBox.Show("Please input Address");
+                }
+                else
+                {
+                    try
+                    {
+                        connetionString = @"Data Source=WIN-U412I9LKOT5\SQLEXPRESS;Initial Catalog=MyTestDB;Integrated Security=True";
+                        con = new SqlConnection(connetionString);
+                        con.Open();
+                        SqlCommand cmd = new SqlCommand("insert into UserTab values (@Tin_ID,@Branch,@Remarks,@Address)", con);
+                        cmd.Parameters.AddWithValue("@Tin_ID", int.Parse(txtID.Text));
+                        cmd.Parameters.AddWithValue("@Branch", txtBranch.Text);
+                        cmd.Parameters.AddWithValue("@Remarks", (txtRemarks.Text));
+                        cmd.Parameters.AddWithValue("@Address", (txtAddress.Text));
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                        clearTxt();
+                        buttonVisibleTrue();
+                        readOnly();
+                        btnInsert.Text = "Add";
+                        txtID.Clear();
+                        MessageBox.Show("Succcessfully Saved");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
+            }
+        }
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            if (btnUpdate.Text == "Edit")
+            {
+                buttonVisibleFalse();
+                btnUpdate.Visible = true;
+                readEnable();
+                btnUpdate.Text = "Update";
+            }
+            else if (btnUpdate.Text == "Update")
+            {
+                if (txtID.Text == "")
+                {
+                    MessageBox.Show("Please input ID");
+                }
+                else if (txtBranch.Text == "")
+                {
+                    MessageBox.Show("Please input Branch");
+                }
+                else if (txtRemarks.Text == "")
+                {
+                    MessageBox.Show("Please input Remarks");
+                }
+                else if (txtAddress.Text == "")
+                {
+                    MessageBox.Show("Please input Address");
+                }
+                else
+                {
+                    try
+                    {
+                        connetionString = @"Data Source=WIN-U412I9LKOT5\SQLEXPRESS;Initial Catalog=MyTestDB;Integrated Security=True";
+                        con = new SqlConnection(connetionString);
+                        con.Open();
+                        SqlCommand cmd = new SqlCommand("Update UserTab set Branch=@Branch, Remarks=@Remarks, Address=@Address where Tin_ID = @Tin_ID", con);
+                        cmd.Parameters.AddWithValue("@Tin_ID", int.Parse(txtID.Text));
+                        cmd.Parameters.AddWithValue("@Branch", txtBranch.Text);
+                        cmd.Parameters.AddWithValue("@Remarks", txtRemarks.Text);
+                        cmd.Parameters.AddWithValue("@Address", txtAddress.Text);
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                        clearTxt();
+                        buttonVisibleTrue();
+                        readOnly();
+                        btnUpdate.Text = "Edit";
+                        txtID.Clear();
+                        MessageBox.Show("Succcessfully Updated");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
+            }
+        }
+            private void btnDelete_Click(object sender, EventArgs e)
+                {
+                DialogResult dialogResult = MessageBox.Show("Are you sure?","Delete Data Information",MessageBoxButtons.YesNo,MessageBoxIcon.Information);
+                if(dialogResult == DialogResult.Yes)
+            {
+                //do something
+                try
+                {
+                    connetionString = @"Data Source=WIN-U412I9LKOT5\SQLEXPRESS;Initial Catalog=MyTestDB;Integrated Security=True";
+                    con = new SqlConnection(connetionString);
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand("Delete UserTab where Tin_ID = @Tin_ID", con);
+                    cmd.Parameters.AddWithValue("@Tin_ID", int.Parse(txtID.Text));
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    clearTxt();
+                    txtID.Clear();
+                    MessageBox.Show("Succcessfully Deleted");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else if (dialogResult == DialogResult.No)
+            {
+            //do something else
+            }
+               
+            }
+
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.Visible == false)
+            {
+                try
+                {
+                    connetionString = @"Data Source=WIN-U412I9LKOT5\SQLEXPRESS;Initial Catalog=MyTestDB;Integrated Security=True";
+                    con = new SqlConnection(connetionString);
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand("Select * from UserTab where Tin_ID=@Tin_ID", con);
+                    cmd.Parameters.AddWithValue("Tin_ID", int.Parse(txtID.Text));
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dataGridView1.DataSource = dt;
+                    pnlTextInfo.Visible = false;
+                    dataGridView1.Visible = true;
+                    buttonVisibleFalse();
+                    btnClear.Visible = false;
+                    btnSearch.Visible = true;
+                    btnSearch.Text = "View In Panel";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else if (dataGridView1.Visible == true)
+            {
+                dataGridView1.Visible = false;
+                pnlTextInfo.Visible = true;
+                btnSearch.Text = "View In Table";
+                buttonVisibleTrue();
+
+            }
+        }
+
+        private void txtID_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                connetionString = @"Data Source=WIN-U412I9LKOT5\SQLEXPRESS;Initial Catalog=MyTestDB;Integrated Security=True";
+                con = new SqlConnection(connetionString);
+                con.Open();
+                if (txtID.Text != "")
+                {
+                    SqlCommand cmd = new SqlCommand("Select Branch,Remarks,Address from UserTab where Tin_ID =@Tin_ID", con);
+                    cmd.Parameters.AddWithValue("@Tin_ID", int.Parse(txtID.Text));
+                    SqlDataReader da = cmd.ExecuteReader();
+                    while (da.Read())
+                    {
+                        txtBranch.Text = da.GetValue(0).ToString();
+                        txtRemarks.Text = da.GetValue(1).ToString();
+                        txtAddress.Text = da.GetValue(2).ToString();
+                    }
+                    con.Close();
+                }
+            }
+            catch 
+            {
+                MessageBox.Show("Incorrect ID");
+                txtID.Clear();
+                clearTxt();
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            dataGridView1.Visible = false;
+            readOnly();
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            clearTxt();
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            if (btnUpdate.Text == "Update")
+            {
+                clearTxt();
+                buttonVisibleTrue();
+                readOnly();
+                btnUpdate.Text = "Edit";
+                txtID.Clear();
+            }
+            else if (btnInsert.Text == "Insert")
+            {
+                clearTxt();
+                buttonVisibleTrue();
+                readOnly();
+                btnInsert.Text = "Add";
+                txtID.Clear();
+
+            }
+        }
+
+        private void iconButton1_Click(object sender, EventArgs e)
+        {
+            pnlTextInfo.Visible = false;
+            dataGridView1.Visible = true;
+            buttonVisibleFalse();
+            btnClear.Visible = false;
+            btnSearch.Visible = true;
+            btnSearch.Text = "View In Panel";
+            connetionString = @"Data Source=WIN-U412I9LKOT5\SQLEXPRESS;Initial Catalog=MyTestDB;Integrated Security=True";
+            con = new SqlConnection(connetionString);
+            con.Open();     
+   
+            SqlDataAdapter dataadapter = new SqlDataAdapter("SELECT * FROM Usertab", con);
+            DataSet ds = new DataSet();          
+            dataadapter.Fill(ds, "UserTab");
+            con.Close();
+            dataGridView1.DataSource = ds;
+            dataGridView1.DataMember = "UserTab";
+        }
+    }
+}
